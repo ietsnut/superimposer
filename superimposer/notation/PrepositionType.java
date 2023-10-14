@@ -1,23 +1,31 @@
 package superimposer.notation;
 
 public enum PrepositionType {
-    IN,
-    ON,
-    AT,
-    BY,
-    FOR,
-    WITH,
-    TO,
-    OF,
-    FROM,
-    AS,
-    INTO,
-    LIKE,
-    THROUGH,
-    AFTER,
-    OVER,
-    BETWEEN,
-    UNDER,
-    BEFORE,
-    DURING;
+
+    IN('a'),
+    ON('a'),
+    AT('a'),
+    BY('a'),
+    FOR('a'),
+    WITH('a'),
+    TO('a'),
+    OF('a'),
+    FROM('a'),
+    AS('a'),
+    INTO('a'),
+    LIKE('a'),
+    THROUGH('a'),
+    AFTER('a'),
+    OVER('a'),
+    BETWEEN('a'),
+    UNDER('a'),
+    BEFORE('a'),
+    DURING('a');
+
+    private char c;
+
+    PrepositionType(char c) {
+        this.c = c;
+    }
+
 }

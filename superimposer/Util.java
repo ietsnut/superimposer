@@ -5,7 +5,7 @@ import java.awt.*;
 
 public class Util {
     public static Image image(String path) {
-        return new ImageIcon(Util.class.getResource(path)).getImage();
+        return Toolkit.getDefaultToolkit().getImage(path);
     }
 
 }
