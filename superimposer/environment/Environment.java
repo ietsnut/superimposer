@@ -14,18 +14,20 @@ public class Environment extends JFrame {
 
     public Environment(int w, int h) {
         super();
-        Environment env = this;
 
         add(new JPanel() {
             @Override
             public void paintComponent(Graphics g) {
+
                 super.paintComponent(g);
                 canvas = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
                 graphics = (Graphics2D) canvas.getGraphics();
                 setBackground(Color.BLACK);
                 graphics.setColor(Color.BLACK);
                 graphics.fillRect(0, 0, w, h);
-                draw();
+                graphics.setColor(Color.WHITE);
+                graphics.fillOval(200, 200, 50, 50);
+                //draw();
                 graphics.drawImage(canvas, 0, 0, this);
                 repaint();
             }
@@ -59,7 +61,8 @@ public class Environment extends JFrame {
     }
 
     public void draw() {
-
+        color(Color.WHITE);
+        circle(100, 200, 200);
     }
 
     public void color(Color color) {
