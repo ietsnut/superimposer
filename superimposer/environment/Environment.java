@@ -1,89 +1,114 @@
 package superimposer.environment;
 
+import superimposer.Superimposer;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.*;
 import java.awt.image.*;
 import javax.swing.*;
 
-public class Environment extends JFrame {
+public class Environment extends JFrame implements MouseListener, MouseMotionListener {
 
-    private Graphics2D graphics;
-    private BufferedImage canvas;
-    private int x, y;
+    protected BufferedImage canvas;
+    protected Graphics2D graphics;
+    protected int x, y, ox, oy, w, h;
 
     public Environment(int w, int h) {
         super();
-
-        add(new JPanel() {
+        this.w = w;
+        this.h = h;
+        this.canvas = new BufferedImage(Superimposer.w, Superimposer.h, BufferedImage.TYPE_INT_RGB);
+        Environment instance = this;
+        setContentPane(new JLabel() {
             @Override
             public void paintComponent(Graphics g) {
-
-                super.paintComponent(g);
-                canvas = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
-                graphics = (Graphics2D) canvas.getGraphics();
-                setBackground(Color.BLACK);
+                graphics = canvas.createGraphics();
                 graphics.setColor(Color.BLACK);
-                graphics.fillRect(0, 0, w, h);
-                graphics.setColor(Color.WHITE);
-                graphics.fillOval(200, 200, 50, 50);
-                //draw();
-                graphics.drawImage(canvas, 0, 0, this);
+                graphics.fillRect(0, 0, Superimposer.w, Superimposer.h);
+                draw();
+                g.drawImage(canvas, -instance.getLocation().x, -instance.getLocation().y, this);
+                graphics.dispose();
                 repaint();
             }
         });
-        addMouseListener(new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent e) {
-                x = e.getX();
-                y = e.getY();
-            }
-        });
-        addMouseMotionListener(new MouseAdapter() {
-            @Override
-            public void mouseDragged(MouseEvent e) {
-                int deltaX = e.getX() - x;
-                int deltaY = e.getY() - y;
-                setLocation(getLocation().x + deltaX, getLocation().y + deltaY);
-            }
-        });
-        addComponentListener(new ComponentAdapter() {
-            @Override
-            public void componentResized(ComponentEvent e) {
-                setShape(new Ellipse2D.Double(0,0,getWidth(),getHeight()));
-            }
-        });
-        setLocationRelativeTo(null);
+        addMouseListener(this);
+        addMouseMotionListener(this);
+    }
+
+    public void run() {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setUndecorated(true);
         setSize(w, h);
+        setPreferredSize(new Dimension(w, h));
+        pack();
+        setLocationRelativeTo(null);
         setVisible(true);
     }
 
     public void draw() {
-        color(Color.WHITE);
-        circle(100, 200, 200);
+
     }
 
-    public void color(Color color) {
-        graphics.setColor(color);
+    public void image(Image img, int x, int y) {
+        graphics.drawImage(img, x, y, this);
     }
 
-    public void circle(int size, int x, int y) {
-        graphics.fillOval(x, y, size, size);
+    public void image(Image img, int x, int y, int w, int h) {
+        graphics.drawImage(img, x, y, w, h, this);
     }
 
-    public void image(String img, int x, int y) {
-        Image image = Toolkit.getDefaultToolkit().getImage(img);
-        graphics.drawImage(image, x, y, this);
+    public void rect(int x, int y, int w, int h) {
+        graphics.fillRect(x, y, w, h);
     }
 
     public void font(int size) {
-        graphics.setFont(new Font("serif", Font.PLAIN, size));
+        graphics.setFont(new Font("MONOSPACED", Font.PLAIN, size));
     }
 
     public void text(String text, int x, int y) {
         graphics.drawString(text, x, y);
     }
 
+    public void color(Color color) {
+        graphics.setColor(color);
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+        ox = e.getX();
+        oy = e.getY();
+    }
+    @Override
+    public void mouseReleased(MouseEvent e) {
+        ox = e.getX();
+        oy = e.getY();
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseDragged(MouseEvent e) {
+        x = e.getX() - ox;
+        y = e.getY() - oy;
+        setLocation(getLocation().x + x, getLocation().y + y);
+    }
+
+    @Override
+    public void mouseMoved(MouseEvent e) {
+
+    }
 }

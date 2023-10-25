@@ -1,7 +1,5 @@
 package superimposer.notation;
 
-import superimposer.Util;
-
 import java.util.*;
 
 public class Notation {
