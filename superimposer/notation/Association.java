@@ -4,6 +4,7 @@ import superimposer.Superimposer;
 
 import java.awt.image.BufferedImage;
 import java.nio.channels.AsynchronousSocketChannel;
+import java.util.List;
 
 public class Association extends Unit {
 
@@ -20,7 +21,10 @@ public class Association extends Unit {
     int vx, vy, vz, ox, oy, oz, dx, dy, dz;
 
     // CONTENT
-    Unit[] units;
+    List<Unit> units;
+
+    // GENERALIZATION
+    Association association;
 
     public Association(BufferedImage image) {
         super(image);
@@ -90,27 +94,18 @@ public class Association extends Unit {
     }
 
     // CONTENT
-    public Association of(Unit[] units) {
-        this.units = units;
+    public Association of(Unit... units) {
+        this.units = List.of(units);
         return this;
     }
-    public Association of(Association association) {
-        this.units = association.units;
+    public Association in(Association association) {
+        association.units.add(this);
         return this;
     }
 
-    // THIS
+    // GENERALIZATION
     public Association like(Association association) {
-        this.image = association.image;
-        this.x = association.x;
-        this.y = association.y;
-        this.z = association.z;
-        this.vx = association.vx;
-        this.vy = association.vy;
-        this.vz = association.vz;
-        this.s = association.s;
-        this.r = association.r;
-        this.units = association.units;
+        this.association = association;
         return this;
     }
 

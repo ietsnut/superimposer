@@ -1,12 +1,10 @@
 package superimposer;
 
-import superimposer.environment.DevelopmentEnvironment;
-import superimposer.environment.Environment;
-import superimposer.environment.InteractiveEnvironment;
-import superimposer.library.Noise;
+import superimposer.windows.Bitmapper;
+import superimposer.windows.IDE;
+import superimposer.windows.Keyboard;
 
 import javax.imageio.ImageIO;
-import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -44,7 +42,17 @@ public class Superimposer {
     // AN
 
     public static void main(String[] args) throws IOException {
+        Dimension size = Toolkit.getDefaultToolkit().getScreenSize();
+        w = (int) size.getWidth();
+        h = (int) size.getHeight();
 
+        new Bitmapper();
+        new Keyboard();
+        new IDE();
+
+        //new UnitEnvironment();
+
+        /*
         Dimension size = Toolkit.getDefaultToolkit().getScreenSize();
         w = (int) size.getWidth();
         h = (int) size.getHeight();
@@ -71,7 +79,7 @@ public class Superimposer {
                 rect(0, Superimposer.h/2, Superimposer.w, Superimposer.h/2);
             }
         };
-
+*/
         /*
         DevelopmentEnvironment ide1 = new DevelopmentEnvironment(width/2, height/8);
 

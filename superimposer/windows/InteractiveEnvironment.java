@@ -1,11 +1,10 @@
-package superimposer.environment;
+package superimposer.windows;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
 
-public class InteractiveEnvironment extends Environment implements KeyListener {
+public class InteractiveEnvironment extends InspectorEnvironment implements KeyListener {
 
     private Polygon polygon;
 

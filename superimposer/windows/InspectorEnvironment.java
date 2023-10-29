@@ -1,25 +1,24 @@
-package superimposer.environment;
+package superimposer.windows;
 
 import superimposer.Superimposer;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.geom.*;
 import java.awt.image.*;
 import javax.swing.*;
 
-public class Environment extends JFrame implements MouseListener, MouseMotionListener {
+public class InspectorEnvironment extends JFrame implements MouseListener, MouseMotionListener {
 
     protected BufferedImage canvas;
     protected Graphics2D graphics;
     protected int x, y, ox, oy, w, h;
 
-    public Environment(int w, int h) {
+    public InspectorEnvironment(int w, int h) {
         super();
         this.w = w;
         this.h = h;
         this.canvas = new BufferedImage(Superimposer.w, Superimposer.h, BufferedImage.TYPE_INT_RGB);
-        Environment instance = this;
+        InspectorEnvironment instance = this;
         setContentPane(new JLabel() {
             @Override
             public void paintComponent(Graphics g) {
@@ -81,13 +80,17 @@ public class Environment extends JFrame implements MouseListener, MouseMotionLis
 
     @Override
     public void mousePressed(MouseEvent e) {
-        ox = e.getX();
-        oy = e.getY();
+        if (SwingUtilities.isRightMouseButton(e)) {
+            ox = e.getX();
+            oy = e.getY();
+        }
     }
     @Override
     public void mouseReleased(MouseEvent e) {
-        ox = e.getX();
-        oy = e.getY();
+        if (SwingUtilities.isRightMouseButton(e)) {
+            ox = e.getX();
+            oy = e.getY();
+        }
     }
 
     @Override
@@ -102,9 +105,11 @@ public class Environment extends JFrame implements MouseListener, MouseMotionLis
 
     @Override
     public void mouseDragged(MouseEvent e) {
-        x = e.getX() - ox;
-        y = e.getY() - oy;
-        setLocation(getLocation().x + x, getLocation().y + y);
+        if (SwingUtilities.isRightMouseButton(e)) {
+            x = e.getX() - ox;
+            y = e.getY() - oy;
+            setLocation(getLocation().x + x, getLocation().y + y);
+        }
     }
 
     @Override
