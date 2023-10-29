@@ -1,5 +1,7 @@
 package superimposer.windows;
 
+import superimposer.Superimposer;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.RoundRectangle2D;
@@ -23,6 +25,9 @@ public class IDE extends Window implements KeyListener {
         graphics.setColor(Color.WHITE);
         graphics.drawRoundRect(25, 25, getWidth() - 50, getHeight() - 50, 100, 100);
         graphics.setFont(new Font("MONOSPACED", Font.PLAIN, getWidth()/10));
+
+
+
         graphics.drawString(code.toString(), getWidth()/50, (int) (getHeight()/1.25));
     }
 

@@ -14,6 +14,7 @@ public class Window extends JFrame implements MouseListener, MouseMotionListener
     public Window(int w, int h, Shape shape) {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setUndecorated(true);
+        setTitle(this.getClass().getSimpleName());
         setShape(shape);
         setSize(w, h);
         setPreferredSize(new Dimension(w, h));
