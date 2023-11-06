@@ -1,9 +1,6 @@
 package superimposer.notation;
 
-import superimposer.Superimposer;
-
 import java.awt.image.BufferedImage;
-import java.nio.channels.AsynchronousSocketChannel;
 import java.util.List;
 
 public class Association extends Unit {
@@ -26,12 +23,10 @@ public class Association extends Unit {
     // GENERALIZATION
     Association association;
 
+    BufferedImage image;
+
     public Association(BufferedImage image) {
         super(image);
-    }
-
-    public void draw() {
-
     }
 
     // LOCATION

@@ -1,10 +1,10 @@
 package superimposer.notation;
 
-import java.awt.image.BufferedImage;
+import java.awt.*;
 
-public class Unit {
-    BufferedImage image;
-    public Unit(BufferedImage image) {
+public class Unit  {
+    public Image image;
+    public Unit(Image image) {
         this.image = image;
     }
 }

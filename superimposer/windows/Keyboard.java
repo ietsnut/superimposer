@@ -1,6 +1,8 @@
 package superimposer.windows;
 
 import superimposer.Superimposer;
+import superimposer.notation.Cardinality;
+import superimposer.notation.Preposition;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
@@ -10,55 +12,55 @@ import java.util.ArrayList;
 
 public class Keyboard extends Window {
 
-    ArrayList<Button> buttons = new ArrayList<>();
+    ArrayList<Preposition> prepositions = new ArrayList<>();
 
     public Keyboard() {
-        super(500, 500, new RoundRectangle2D.Double(0, 0, 500, 500, 100, 100));
-        int i = 0;
-        for (int x = 50; x <= getWidth() - 100; x += 100) {
-            for (int y = 50; y <= getHeight() - 100; y += 100) {
-                buttons.add(new Button(x, y, i++));
-            }
+        super(1000, 500, new RoundRectangle2D.Double(0, 0, 1000, 500, 100, 100));
+        for (Cardinality cardinality : Cardinality.values()) {
+            prepositions.add(new Preposition(Superimposer.bimage(cardinality.name().toLowerCase() + ".png").getScaledInstance(300, 150, Image.SCALE_SMOOTH), cardinality));
         }
     }
 
     @Override
     public void draw() {
         graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        graphics.setColor(Color.BLACK);
-        graphics.fillRect(0, 0, getWidth(), getHeight());
-        graphics.setStroke(new BasicStroke(10, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        graphics.setBackground(Color.BLACK);
+        graphics.clearRect(0, 0, getWidth(), getHeight());
         graphics.setColor(Color.WHITE);
-        graphics.drawRoundRect(25, 25, getWidth() - 50, getHeight() - 50, 50, 50);
-        for(Button button : buttons) {
-            graphics.setStroke(new BasicStroke(1));
-            graphics.setColor(Color.WHITE);
-            graphics.fillRoundRect(button.x, button.y, 100, 100, 50, 50);
-            graphics.setColor(Color.BLACK);
-            graphics.drawRoundRect(button.x, button.y, 100, 80, 50, 50);
-        }
-
-    }
-
-    @Override
-    public void mouseClicked(MouseEvent e) {
-        for (Button button : buttons) {
-            if (e.getX() > button.x && e.getX() < button.x + 100 && e.getY() > button.y && e.getY() < button.y + 100) {
-                button.click();
+        int x = 25;
+        int y = 25;
+        for (Preposition preposition : prepositions) {
+            graphics.drawImage(preposition.image, x, y, 200, 100, this);
+            x += 250;
+            if (x > 800) {
+                y += 125;
+                x = 25;
             }
         }
     }
 
-    class Button {
-        int x, y, i;
-        public Button(int x, int y, int i) {
-            this.x = x;
-            this.y = y;
-            this.i = i;
-        }
-        public void click() {
-            Superimposer.instance.ide.code.append(i);
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        super.mouseClicked(e);
+        int x = 25;
+        int y = 25;
+        for (Preposition preposition : prepositions) {
+            if (e.getX() > x && e.getX() < x + 200 && e.getY() > y && e.getY() < y + 100) {
+                if (!Superimposer.code.units.isEmpty() && !(Superimposer.code.units.get(Superimposer.code.units.size() - 1) instanceof Preposition)) {
+                    Superimposer.code.units.add(preposition);
+                    Superimposer.code.repaint();
+                    break;
+                }
+            }
+            x += 250;
+            if (x > 800) {
+                y += 125;
+                x = 25;
+            }
         }
     }
+
+
+
 
 }

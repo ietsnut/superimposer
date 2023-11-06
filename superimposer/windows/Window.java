@@ -1,8 +1,16 @@
 package superimposer.windows;
 
+import org.apache.batik.swing.JSVGCanvas;
+import org.apache.batik.transcoder.TranscoderException;
+import org.apache.batik.transcoder.TranscoderInput;
+import org.apache.batik.transcoder.TranscoderOutput;
+import org.apache.batik.transcoder.image.ImageTranscoder;
+import org.apache.batik.transcoder.image.PNGTranscoder;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.geom.Area;
 import java.awt.image.BufferedImage;
 
 public class Window extends JFrame implements MouseListener, MouseMotionListener {
@@ -12,29 +20,25 @@ public class Window extends JFrame implements MouseListener, MouseMotionListener
     int x, y;
 
     public Window(int w, int h, Shape shape) {
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setUndecorated(true);
-        setTitle(this.getClass().getSimpleName());
-        setShape(shape);
-        setSize(w, h);
+        setShape(new Area(shape));
+        setSize(new Dimension(w, h));
         setPreferredSize(new Dimension(w, h));
         pack();
         setLocationRelativeTo(null);
-        canvas = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
-        graphics = canvas.createGraphics();
-        graphics.setColor(Color.BLACK);
-        graphics.fillRect(0, 0, w, h);
+        this.canvas = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+        this.graphics = canvas.createGraphics();
+        this.graphics.setColor(Color.BLACK);
+        this.graphics.fillRect(0, 0, w, h);
         addMouseListener(this);
         addMouseMotionListener(this);
+        //setAlwaysOnTop(true);
+        toFront();
+        setFocusable(true);
+        setFocusableWindowState(true);
+        repaint();
+
         setVisible(true);
-        new Thread(new Runnable() {
-            @Override
-            public void run(){
-                while (!Thread.currentThread().isInterrupted()) {
-                    repaint();
-                }
-            }
-        }).start();
     }
 
     public void draw() {
@@ -44,12 +48,12 @@ public class Window extends JFrame implements MouseListener, MouseMotionListener
     @Override
     public void paint(Graphics g) {
         draw();
-        g.drawImage(canvas, 0, 0, this);
+        g.drawImage(this.canvas, 0, 0, this);
+        Toolkit.getDefaultToolkit().sync();
     }
 
     @Override
     public void mouseClicked(MouseEvent e) {
-
     }
 
     @Override

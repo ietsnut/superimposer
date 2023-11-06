@@ -1,0 +1,9 @@
+<component name="ArtifactManager">
+  <artifact type="jar" build-on-make="true" name="superimposer:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/superimposer_jar</output-path>
+    <root id="archive" name="superimposer.jar">
+      <element id="module-output" name="superimposer" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/batik-all-1.17.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>
