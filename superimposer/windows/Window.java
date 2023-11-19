@@ -15,29 +15,28 @@ import java.awt.image.BufferedImage;
 
 public class Window extends JFrame implements MouseListener, MouseMotionListener {
 
-    BufferedImage canvas;
-    Graphics2D graphics;
-    int x, y;
+    protected BufferedImage canvas;
+    protected Graphics2D graphics;
+    protected int x, y;
 
-    public Window(int w, int h, Shape shape) {
+    public Window(int w, int h, int screen, Shape shape) {
         setUndecorated(true);
         setShape(new Area(shape));
         setSize(new Dimension(w, h));
         setPreferredSize(new Dimension(w, h));
         pack();
-        setLocationRelativeTo(null);
+        Rectangle bounds = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()[screen].getDefaultConfiguration().getBounds();
+        setLocation(bounds.x + bounds.width / 2 - w / 2, bounds.y + bounds.height / 2 - h / 2);
         this.canvas = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
         this.graphics = canvas.createGraphics();
         this.graphics.setColor(Color.BLACK);
         this.graphics.fillRect(0, 0, w, h);
         addMouseListener(this);
         addMouseMotionListener(this);
-        //setAlwaysOnTop(true);
         toFront();
         setFocusable(true);
         setFocusableWindowState(true);
         repaint();
-
         setVisible(true);
     }
 

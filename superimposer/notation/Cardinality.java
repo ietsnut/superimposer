@@ -12,10 +12,13 @@ public enum Cardinality {
     BY('X'),
     AT('8');
 
-    private char c;
+    private final char character;
 
-    Cardinality(char c) {
-        this.c = c;
+    Cardinality(char character) {
+        this.character = character;
     }
 
+    public char getCharacter() {
+        return this.character;
+    }
 }
