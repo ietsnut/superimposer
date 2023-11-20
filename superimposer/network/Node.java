@@ -1,7 +1,5 @@
 package superimposer.network;
 
-import superimposer.notation.Association;
-
 import java.io.*;
 import java.net.*;
 import java.util.*;
@@ -16,11 +14,12 @@ public class Node {
     public State state;
 
     public Node() {
-        try (Socket socket = new Socket(Relay.ADDRESS, Relay.PORT)) {
-            this.socket = socket;
+        try {
             this.states = new HashMap<>();
-            this.in = new In(new ObjectInputStream(socket.getInputStream()));
-            this.out = new Out(new ObjectOutputStream(socket.getOutputStream()));
+            this.state = new State();
+            this.socket = new Socket(Relay.ADDRESS, Relay.PORT);
+            this.out = new Out(socket);
+            this.in = new In(socket);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -28,8 +27,8 @@ public class Node {
 
     class In extends Thread {
         private final ObjectInputStream in;
-        protected In(ObjectInputStream in) {
-            this.in = in;
+        protected In(Socket socket) throws IOException {
+            this.in = new ObjectInputStream(socket.getInputStream());
             this.start();
         }
         @Override
@@ -37,6 +36,7 @@ public class Node {
             while (!socket.isClosed() && isAlive()) {
                 try {
                     Object object = in.readObject();
+                    System.out.println(this.getId() + " NODE: IN");
                     if (object instanceof superimposer.network.State state) {
                         states.put(state.id, state);
                     }
@@ -49,14 +49,15 @@ public class Node {
 
     class Out extends Thread {
         private final ObjectOutputStream out;
-        protected Out(ObjectOutputStream out) {
-            this.out = out;
+        protected Out(Socket socket) throws IOException {
+            this.out = new ObjectOutputStream(socket.getOutputStream());
             this.start();
         }
         @Override
         public void run() {
             while (!socket.isClosed() && isAlive()) {
                 try {
+                    System.out.println(this.getId() + " NODE: OUT");
                     out.writeObject(state);
                     out.flush();
                 } catch (IOException e) {

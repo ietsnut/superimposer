@@ -11,16 +11,16 @@ public class Superimposer {
     public ArrayList<Node> nodes;
 
     public Superimposer(String[] args) {
-        nodes = new ArrayList<>();
+        this.nodes = new ArrayList<>();
         for (String mode : args) {
             if (mode.equalsIgnoreCase("relay")) {
                 this.relay = new Relay();
             }
             if (mode.equalsIgnoreCase("node")) {
-                nodes.add(new Node());
+                this.nodes.add(new Node());
             }
         }
-        load();
+        //load();
         //save();
     }
 
@@ -62,5 +62,4 @@ public class Superimposer {
             throw new RuntimeException(e);
         }
     }
-
 }

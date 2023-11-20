@@ -1,8 +1,7 @@
 package superimposer.notation;
 
 import javax.swing.*;
-import java.io.Serial;
-import java.io.Serializable;
+import java.io.*;
 
 public class Unit implements Serializable {
 

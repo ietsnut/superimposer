@@ -13,8 +13,8 @@ public class Relay extends Thread {
     private final ServerSocket socket;
 
     public Relay() {
-        try (ServerSocket socket = new ServerSocket(PORT)) {
-            this.socket = socket;
+        try {
+            this.socket = new ServerSocket(PORT);
             this.nodes = new ArrayList<>();
             this.start();
         } catch (IOException e) {
@@ -24,11 +24,12 @@ public class Relay extends Thread {
 
     @Override
     public void run() {
+        System.out.println("RELAY: " + "STARTED");
         while (isAlive()) {
-            try (Socket socket = this.socket.accept()) {
-                ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
-                ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
-                Node node = new Node(socket, in, out);
+            try {
+                Socket socket = this.socket.accept();
+                System.out.println("RELAY: " + "ACCEPTED NODE");
+                Node node = new Node(socket);
                 nodes.add(node);
                 node.start();
             } catch (IOException e) {
@@ -43,10 +44,10 @@ public class Relay extends Thread {
         private final ObjectOutputStream out;
         private final ObjectInputStream in;
 
-        public Node(Socket socket, ObjectInputStream in, ObjectOutputStream out) {
+        public Node(Socket socket) throws IOException {
             this.socket = socket;
-            this.out = out;
-            this.in = in;
+            this.out = new ObjectOutputStream(socket.getOutputStream());
+            this.in = new ObjectInputStream(socket.getInputStream());
         }
 
         @Override
@@ -56,10 +57,12 @@ public class Relay extends Thread {
                     Object object = in.readObject();
                     if (object instanceof superimposer.network.State state) {
                         state.id = nodes.indexOf(this);
+                        System.out.println("RELAY: " + "INCOMING NODE STATE");
                         for (Node node : nodes) {
                             if (!node.socket.equals(this.socket)) {
                                 out.writeObject(state);
                                 out.flush();
+                                System.out.println("RELAY: " + "RELAYING NODE STATE");
                             }
                         }
                     }
