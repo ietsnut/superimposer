@@ -1,18 +1,22 @@
 package superimposer.notation;
 
 import javax.swing.*;
-import java.awt.*;
+import java.io.*;
 
-public class Association extends Unit {
+public class Association extends Unit implements Serializable {
 
-    Unit[] units;
+    @Serial
+    private static final long serialVersionUID = 1;
 
-    public Association(ImageIcon icon, Wave t, Wave x, Wave y, Wave z, Wave s, Wave r, Unit[] units) {
-        super(icon, t, x, y, z, s, r);
+    public Unit[] units;
+    public final ImageIcon background;
+    public final ImageIcon border;
+
+    public Association(ImageIcon icon, int x, int y, ImageIcon background, ImageIcon border, Unit... units) {
+        super(icon, x, y);
         this.units = units;
+        this.background = background;
+        this.border = border;
     }
 
-    public Unit[] getUnits() {
-        return units;
-    }
 }

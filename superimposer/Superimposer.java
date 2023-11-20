@@ -1,55 +1,66 @@
 package superimposer;
 
 import superimposer.network.*;
-import superimposer.notation.Unit;
-import superimposer.notation.Wave;
-
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
+import javax.swing.*;
 import java.io.*;
+import java.util.*;
 
 public class Superimposer {
 
-    Server server;
-    Peer peer1;
-    Peer peer2;
-    Peer peer3;
+    public Relay relay;
+    public ArrayList<Node> nodes;
 
-    public Superimposer() {
-        this.server = new Server();
-        this.peer1 = new Peer();
-        this.peer2 = new Peer();
-        this.peer3 = new Peer();
-
-        Unit unit = new Unit(null, new Wave(0, 1), new Wave(0, 1), new Wave(0, 1), new Wave(0, 1), new Wave(0, 1), new Wave(0, 1));
-
-        peer1.out(new PeerData(10, 20, unit, unit));
-        peer2.out(new PeerData(50, 20, unit, unit));
-        peer3.out(new PeerData(150, 20, unit, unit));
-        peer3.out(new PeerData(100, 20, unit, unit));
-
-        new Test().start();
+    public Superimposer(String[] args) {
+        nodes = new ArrayList<>();
+        for (String mode : args) {
+            if (mode.equalsIgnoreCase("relay")) {
+                this.relay = new Relay();
+            }
+            if (mode.equalsIgnoreCase("node")) {
+                nodes.add(new Node());
+            }
+        }
+        load();
+        //save();
     }
 
-    class Test extends Thread {
-        @Override
-        public void run() {
-            while(isAlive()) {
-                //System.out.println( peer1.getPeers().size());
+    public static void main(String[] args) {
+        new Superimposer(args);
+    }
+
+    public ImageIcon image(String path) {
+        return new ImageIcon(getClass().getResource(path));
+    }
+
+    private void load() {
+        for (Node node : nodes) {
+            try {
+                FileInputStream fi = new FileInputStream("node_" + nodes.indexOf(node));
+                ObjectInputStream oi = new ObjectInputStream(fi);
+                node.state = (State) oi.readObject();
+                oi.close();
+                fi.close();
+            } catch (FileNotFoundException e) {
+                System.out.println("Node file not found");
+            } catch (IOException e) {
+                System.out.println("Error initializing stream");
+            } catch (ClassNotFoundException e) {
+                throw new ClassCastException();
             }
         }
     }
 
-    public static void main(String[] args) {
-        new Superimposer();
-    }
-
-
-    public static BufferedImage image(String path) {
+    private void save() {
         try {
-            return ImageIO.read(ClassLoader.getSystemResource(path));
+            for (Node node : nodes) {
+                FileOutputStream f = new FileOutputStream("node_" + nodes.indexOf(node));
+                ObjectOutputStream o = new ObjectOutputStream(f);
+                o.writeObject(node.state);
+                o.close();
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
+
 }
