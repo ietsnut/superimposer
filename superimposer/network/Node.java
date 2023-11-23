@@ -60,7 +60,8 @@ public class Node {
                     System.out.println(this.getId() + " NODE: OUT");
                     out.writeObject(state);
                     out.flush();
-                } catch (IOException e) {
+                    Thread.sleep(16);
+                } catch (IOException | InterruptedException e) {
                     throw new RuntimeException(e);
                 }
             }

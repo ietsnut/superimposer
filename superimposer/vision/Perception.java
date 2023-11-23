@@ -4,10 +4,9 @@ import superimposer.notation.*;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import java.awt.event.*;
 import java.awt.geom.*;
-import java.awt.image.BufferedImage;
+import java.awt.image.*;
 
 public class Perception extends Perspective implements KeyListener {
 
@@ -15,9 +14,9 @@ public class Perception extends Perspective implements KeyListener {
     BufferedImage background;
     BufferedImage border;
 
-    public Perception(int w, int h, int screen, Shape shape, ImageIcon border, ImageIcon background) {
+    public Perception(int w, int h, int screen, Shape shape, ImageIcon background) {
         super(w, h, screen, shape);
-        this.border = (BufferedImage) border.getImage();
+        this.border =
         this.background = (BufferedImage) background.getImage();
     }
 

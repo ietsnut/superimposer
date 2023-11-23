@@ -10,13 +10,11 @@ public class Association extends Unit implements Serializable {
 
     public Unit[] units;
     public final ImageIcon background;
-    public final ImageIcon border;
 
-    public Association(ImageIcon icon, int x, int y, ImageIcon background, ImageIcon border, Unit... units) {
+    public Association(ImageIcon icon, int x, int y, ImageIcon background, Unit... units) {
         super(icon, x, y);
         this.units = units;
         this.background = background;
-        this.border = border;
     }
 
 }
