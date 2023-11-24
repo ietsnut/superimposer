@@ -8,15 +8,16 @@ import java.awt.event.*;
 import java.awt.geom.*;
 import java.awt.image.*;
 
-public class Perception extends Perspective implements KeyListener {
+public abstract class Perception extends Perspective {
 
     Association association;
     BufferedImage background;
     BufferedImage border;
 
-    public Perception(int w, int h, int screen, Shape shape, ImageIcon background) {
-        super(w, h, screen, shape);
-        this.border =
+    public Perception(int w, int h, Shape shape, ImageIcon background) {
+        super(w, h, shape);
+        // USE VolatileImage
+        this.border = null;
         this.background = (BufferedImage) background.getImage();
     }
 
@@ -37,18 +38,4 @@ public class Perception extends Perspective implements KeyListener {
         }
     }
 
-    @Override
-    public void keyTyped(KeyEvent e) {
-
-    }
-
-    @Override
-    public void keyPressed(KeyEvent e) {
-
-    }
-
-    @Override
-    public void keyReleased(KeyEvent e) {
-
-    }
 }

@@ -3,34 +3,37 @@ package superimposer.vision;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.geom.Area;
-import java.awt.image.BufferedImage;
+import java.awt.geom.*;
+import java.awt.image.*;
 
-public class Perspective extends JFrame implements MouseListener, MouseMotionListener {
+public abstract class Perspective extends JFrame implements MouseListener, MouseMotionListener, KeyListener, MouseWheelListener {
 
-    protected BufferedImage canvas;
+    protected BufferStrategy buffer;
     protected Graphics2D graphics;
     protected int x, y;
 
-    public Perspective(int w, int h, int screen, Shape shape) {
-        setUndecorated(true);
+    public Perspective(int w, int h, Shape shape) {
+        System.setProperty("sun.java2d.opengl", "true");
         setShape(new Area(shape));
         setSize(new Dimension(w, h));
         setPreferredSize(new Dimension(w, h));
         pack();
-        Rectangle bounds = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()[screen].getDefaultConfiguration().getBounds();
-        setLocation(bounds.x + bounds.width / 2 - w / 2, bounds.y + bounds.height / 2 - h / 2);
-        this.canvas = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
-        this.graphics = canvas.createGraphics();
+        setUndecorated(true);
+        setLocationRelativeTo(null);
+        createBufferStrategy(2);
+        this.buffer = getBufferStrategy();
+        this.graphics = (Graphics2D) buffer.getDrawGraphics();
         this.graphics.setColor(Color.BLACK);
         this.graphics.fillRect(0, 0, w, h);
         addMouseListener(this);
         addMouseMotionListener(this);
+        addKeyListener(this);
+        addMouseWheelListener(this);
         toFront();
         setFocusable(true);
         setFocusableWindowState(true);
-        repaint();
         setVisible(true);
+        repaint();
     }
 
     public void draw() {
@@ -39,13 +42,14 @@ public class Perspective extends JFrame implements MouseListener, MouseMotionLis
 
     @Override
     public void paint(Graphics g) {
-        draw();
-        g.drawImage(this.canvas, 0, 0, this);
+        try {
+            this.graphics = (Graphics2D) buffer.getDrawGraphics();
+            draw();
+        } finally {
+            this.graphics.dispose();
+        }
+        buffer.show();
         Toolkit.getDefaultToolkit().sync();
-    }
-
-    @Override
-    public void mouseClicked(MouseEvent e) {
     }
 
     @Override
@@ -65,27 +69,12 @@ public class Perspective extends JFrame implements MouseListener, MouseMotionLis
     }
 
     @Override
-    public void mouseEntered(MouseEvent e) {
-
-    }
-
-    @Override
-    public void mouseExited(MouseEvent e) {
-
-    }
-
-    @Override
     public void mouseDragged(MouseEvent e) {
         if (SwingUtilities.isRightMouseButton(e)) {
             int x2 = e.getX() - x;
             int y2 = e.getY() - y;
             setLocation(getLocation().x + x2, getLocation().y + y2);
         }
-    }
-
-    @Override
-    public void mouseMoved(MouseEvent e) {
-
     }
 
 }
