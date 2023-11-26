@@ -1,6 +1,9 @@
 package superimposer;
 
+import superimposer.library.Image;
 import superimposer.network.*;
+import superimposer.vision.Perspective;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.*;
@@ -11,6 +14,7 @@ public class Superimposer {
 
     public Relay relay;
     public ArrayList<Node> nodes;
+    public static int SCALE = 1;
 
     public Superimposer(String[] args) {
         /*
@@ -30,62 +34,36 @@ public class Superimposer {
 
     public static void main(String[] args) {
         System.setProperty("sun.java2d.opengl", "true");
-        new Superimposer(args);
+        System.setProperty("sun.java2d.uiScale", "1");
+        /*
+        ArrayList<BufferedImage> bufferedImages = new ArrayList<>();
+        for (int i = 1; i < 6; i ++) {
+            bufferedImages.add(new Image("s00" + i).trim().image());
+        }
+        SwingUtilities.invokeLater(() -> new Test(bufferedImages));
+        */
+        Image image = new Image("f006");
+        SwingUtilities.invokeLater(() -> {
+            new Perspective(image.image().getWidth()/2, image.image().getHeight()/2, "f006", "f006");
+        });
     }
-
-    public static ImageIcon icon(String name) {
-        return new ImageIcon(image(name));
-    }
-
-    public static BufferedImage image(String name) {
-        Image image = new ImageIcon("resource/" + name + ".jpg").getImage();
-        BufferedImage bufferedImage = new BufferedImage(image.getWidth(null), image.getHeight(null), BufferedImage.TYPE_BYTE_BINARY);
-        Graphics2D g2d = bufferedImage.createGraphics();
-        g2d.drawImage(image, 0, 0, null);
-        g2d.dispose();
-        int top = 0, bottom = bufferedImage.getHeight() - 1, left = 0, right = bufferedImage.getWidth() - 1;
-        searchTop:
-        for (int y = 0; y < bufferedImage.getHeight(); y++) {
-            for (int x = 0; x < bufferedImage.getWidth(); x++) {
-                if (bufferedImage.getRGB(x, y) != Color.WHITE.getRGB()) {
-                    top = y;
-                    break searchTop;
-                }
+    /*
+    public static void main(String[] args) throws IOException {
+        //System.setProperty("sun.java2d.opengl", "true");
+        //new Superimposer(args);
+        VolatileImage image = new Image("f002").threshold().trim().scale(0.5f, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR).render();
+        JFrame frame = new JFrame("Test");
+        frame.add(new JComponent() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                g.drawImage(image, 0, 0, image.getWidth(), image.getHeight(), this);
             }
-        }
-        searchBottom:
-        for (int y = bufferedImage.getHeight() - 1; y >= 0; y--) {
-            for (int x = 0; x < bufferedImage.getWidth(); x++) {
-                if (bufferedImage.getRGB(x, y) != Color.WHITE.getRGB()) {
-                    bottom = y;
-                    break searchBottom;
-                }
-            }
-        }
-        searchLeft:
-        for (int x = 0; x < bufferedImage.getWidth(); x++) {
-            for (int y = 0; y < bufferedImage.getHeight(); y++) {
-                if (bufferedImage.getRGB(x, y) != Color.WHITE.getRGB()) {
-                    left = x;
-                    break searchLeft;
-                }
-            }
-        }
-        searchRight:
-        for (int x = bufferedImage.getWidth() - 1; x >= 0; x--) {
-            for (int y = 0; y < bufferedImage.getHeight(); y++) {
-                if (bufferedImage.getRGB(x, y) != Color.WHITE.getRGB()) {
-                    right = x;
-                    break searchRight;
-                }
-            }
-        }
-        int newWidth = right - left + 1;
-        int newHeight = bottom - top + 1;
-        BufferedImage trimmedImage = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_BYTE_BINARY);
-        trimmedImage.getGraphics().drawImage(bufferedImage.getSubimage(left, top, newWidth, newHeight), 0, 0, null);
-        return trimmedImage;
-    }
+        });
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(image.getWidth(), image.getHeight());
+        frame.setVisible(true);
+    }*/
 
     private void load() {
         for (Node node : nodes) {
@@ -117,6 +95,4 @@ public class Superimposer {
             throw new RuntimeException(e);
         }
     }
-
-
 }

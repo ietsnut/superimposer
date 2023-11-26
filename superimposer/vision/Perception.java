@@ -4,25 +4,24 @@ import superimposer.notation.*;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
 import java.awt.geom.*;
 import java.awt.image.*;
+import java.io.IOException;
 
-public abstract class Perception extends Perspective {
+public class Perception extends Perspective {
 
     Association association;
     BufferedImage background;
     BufferedImage border;
 
-    public Perception(int w, int h, Shape shape, ImageIcon background) {
-        super(w, h, shape);
-        // USE VolatileImage
+    public Perception(int w, int h, String border, String shape, ImageIcon background) throws IOException {
+        super(w, h, border, shape);
         this.border = null;
         this.background = (BufferedImage) background.getImage();
     }
 
     @Override
-    public void draw() {
+    public void draw(Graphics graphics) {
         graphics.drawImage(border, 0, 0, this);
         int x = (int) Math.min(getLocationOnScreen().getX(), background.getWidth(this) - getWidth());
         int y = (int) Math.min(getLocationOnScreen().getY(), background.getHeight(this) - getHeight());
@@ -34,7 +33,7 @@ public abstract class Perception extends Perspective {
             transform.rotate(child.r());
             transform.scale(child.s(), child.s());
              */
-            graphics.drawImage(child.icon.getImage(), transform, this);
+            //graphics.drawImage(child.icon.getImage(), transform, this);
         }
     }
 
