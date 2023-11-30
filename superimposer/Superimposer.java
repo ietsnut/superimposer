@@ -2,6 +2,8 @@ package superimposer;
 
 import superimposer.library.Image;
 import superimposer.network.*;
+import superimposer.notation.Unit;
+import superimposer.vision.AssociationView;
 import superimposer.vision.Perspective;
 
 import javax.swing.*;
@@ -33,19 +35,7 @@ public class Superimposer {
     }
 
     public static void main(String[] args) {
-        System.setProperty("sun.java2d.opengl", "true");
-        System.setProperty("sun.java2d.uiScale", "1");
-        /*
-        ArrayList<BufferedImage> bufferedImages = new ArrayList<>();
-        for (int i = 1; i < 6; i ++) {
-            bufferedImages.add(new Image("s00" + i).trim().image());
-        }
-        SwingUtilities.invokeLater(() -> new Test(bufferedImages));
-        */
-        Image image = new Image("f006");
-        SwingUtilities.invokeLater(() -> {
-            new Perspective(image.image().getWidth()/2, image.image().getHeight()/2, "f006", "f006");
-        });
+        SwingUtilities.invokeLater(AssociationView::new);
     }
     /*
     public static void main(String[] args) throws IOException {
@@ -64,6 +54,7 @@ public class Superimposer {
         frame.setSize(image.getWidth(), image.getHeight());
         frame.setVisible(true);
     }*/
+
 
     private void load() {
         for (Node node : nodes) {

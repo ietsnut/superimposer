@@ -12,6 +12,5 @@ public class State implements Serializable {
     public Unit[] units;
     public int x;
     public int y;
-    public Association association;
 
 }
