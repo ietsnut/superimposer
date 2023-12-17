@@ -15,43 +15,59 @@ import superimposer.library.Image;
 public class Bartender extends Perspective {
 
     ArrayList<VolatileImage> drinks = new ArrayList<>();
-    ArrayList<VolatileImage> amounts = new ArrayList<>();
-    ArrayList<VolatileImage> current = new ArrayList<>();
+    ArrayList<VolatileImage> qrs = new ArrayList<>();
+    VolatileImage current;
     int data = 0;
     private Perspective fourier;
     private Perspective drink;
     private Perspective meta;
+    private Perspective qr;
     byte[] audioBuffer;
     boolean done = false;
     String drinkname = "";
+    Font font;
+    Font font2;
 
     public Bartender() {
-        super(1320, 250, 2);
-        for (int i = 0; i < 10; i++) {
-            drinks.add(new Image("relation/" + i + ".png").scale(160, 160, RenderingHints.VALUE_INTERPOLATION_BILINEAR).dither().render());
-        }
-        for (int i = 0; i < 10; i++) {
-            amounts.add(new Image("b/b" + i + ".jpg").dither().scale(100, RenderingHints.VALUE_INTERPOLATION_BILINEAR).render());
-        }
-        this.drink = new Perspective(464, 367, 6) {
-            @Override
-            public void draw(Graphics2D graphics) {
-                graphics.drawImage(amounts.get(data), 175, 125, null);
-            }
-        };
+        super(1000, 250, 2);
         InputStream is = Superimposer.class.getResourceAsStream("/resource/font.ttf");
-        Font font = null;
         try {
             font = Font.createFont(Font.TRUETYPE_FONT, is);
         } catch (FontFormatException | IOException e) {
             throw new RuntimeException(e);
         }
-        Font sizedFont = font.deriveFont(30f);
+        font = font.deriveFont(30f);
+        font2 = font.deriveFont(60f);
+        for (int i = 0; i < 5; i++) {
+            drinks.add(new Image("relation/" + i + ".png").scale(230, 230, RenderingHints.VALUE_INTERPOLATION_BILINEAR).dither().render());
+            qrs.add(new Image("qr" + i + ".jpg").scale(350, 350, RenderingHints.VALUE_INTERPOLATION_BILINEAR).render());
+        }
+        this.drink = new Perspective(464, 367, 6) {
+            @Override
+            public void draw(Graphics2D graphics) {
+                if (current != null) {
+                    graphics.drawImage(current, 110, 90, null);
+                }
+
+            }
+        };
+        this.qr = new Perspective(920, 730, 5) {
+            @Override
+            public void draw(Graphics2D graphics) {
+                this.setFocusable(false);
+                this.setAlwaysOnTop(true);
+                if (done && current != null) {
+                    graphics.setColor(Color.BLACK);
+                    graphics.fillRect(200, 150, 500, 450);
+                    graphics.drawImage(qrs.get(drinks.indexOf(current)), 250, 190, null);
+                }
+            }
+        };
         this.meta = new Perspective(740, 340, 3) {
             @Override
             public void draw(Graphics2D graphics) {
 
-                FontMetrics metrics = graphics.getFontMetrics(sizedFont);
+                FontMetrics metrics = graphics.getFontMetrics(font);
                 int yy = 0;
                 yy -= metrics.getHeight();
                 graphics.setColor(Color.RED);
@@ -63,7 +79,7 @@ public class Bartender extends Perspective {
                     int x = (740 - metrics.stringWidth(line)) / 2;
                     // Determine the Y coordinate for the text (note we add the ascent, as in java 2d 0 is top of the screen)
                     int y = ((340 - metrics.getHeight()) / 2) + metrics.getAscent() + yy;
-                    graphics.setFont(sizedFont);
+                    graphics.setFont(font);
                     graphics.drawString(line, x, y);
                     yy+=metrics.getHeight();
                 }
@@ -84,7 +100,13 @@ public class Bartender extends Perspective {
                 graphics.setColor(Color.LIGHT_GRAY);
                 graphics.setStroke(new BasicStroke(3));
 
-                int numWaves = current.size(); // Number of sine waves to combine
+                int numWaves; // Number of sine waves to combine
+                if (current == null) {
+                    numWaves = 0;
+                } else {
+                    numWaves = drinks.indexOf(current);
+                }
+
                 audioBuffer = new byte[2 * numWaves];
 
                 int xPrev = 0;
@@ -97,8 +119,8 @@ public class Bartender extends Perspective {
                     for (int j = 1; j <= numWaves; j++) {
                         double amplitude = (double) 25 / (double) (data + 1); // Change amplitude for each wave
                         double phaseShift = Math.PI / 2 * j; // Change phase shift for each wave
-                        y += amplitude * Math.sin(drinks.indexOf(current.get(j-1)) * 2 * i * 2 * Math.PI / 500 + phaseShift);
-                        sample = amplitude * Math.sin(2 * Math.PI * drinks.indexOf(current.get(j-1)) * i / 44100 + phaseShift);
+                        y += amplitude * Math.sin(numWaves * 2 * i * 2 * Math.PI / 500 + phaseShift);
+                        sample = amplitude * Math.sin(2 * Math.PI * numWaves * i / 44100 + phaseShift);
                         short sampleValue = (short) (sample * Short.MAX_VALUE);
                         audioBuffer[2 * (j-1)] = (byte) (sampleValue & 0xFF);
                         audioBuffer[2 * (j-1) + 1] = (byte) ((sampleValue >> 8) & 0xFF);
@@ -127,11 +149,25 @@ public class Bartender extends Perspective {
 
     @Override
     public void draw(Graphics2D graphics) {
-        int x = 175;
-        for (VolatileImage img : current) {
-            graphics.drawImage(img, x, 45, null);
-            x += 160;
+
+        FontMetrics metrics = graphics.getFontMetrics(font2);
+        graphics.setColor(Color.ORANGE);
+        int drink = drinks.indexOf(current);
+        String d = "";
+        switch(drink) {
+            case 0 -> d = "Beer (€ 2,5)";
+            case 1 -> d = "Wine (€ 3)";
+            case 2 -> d = "Cola (€ 1)";
+            case 3 -> d = "Coffee (€ 1)";
+            case 4 -> d = "Tea (€ 1)";
         }
+        int x = (1000 - metrics.stringWidth(d)) / 2;
+        // Determine the Y coordinate for the text (note we add the ascent, as in java 2d 0 is top of the screen)
+        int y = ((250 - metrics.getHeight()) / 2) + metrics.getAscent();
+        graphics.setFont(font2);
+        graphics.drawString(d, x, y);
+
+        this.requestFocus();
         // Create an AudioFormat
         AudioFormat audioFormat = new AudioFormat(44100, 16, 1, true, true);
 
@@ -153,31 +189,32 @@ public class Bartender extends Perspective {
     }
 
     @Override
-    public void keyPressed(KeyEvent e) {
+    public void keyReleased(KeyEvent e) {
         int key = e.getKeyCode();
-        if (key == KeyEvent.VK_B && !current.isEmpty()) {
-            current.clear();
+        if (key == KeyEvent.VK_B && current != null) {
+            current = null;
             drinkname = "";
             done = false;
+            qr.setVisible(false);
         }
         if (key == KeyEvent.VK_G) {
             done = true;
-            drinkname = FantasyDrink.generateRandomDrink();
+            qr.setVisible(true);
         }
         if (key >= KeyEvent.VK_0 && key <= KeyEvent.VK_9 && !done) {
             data = Integer.parseInt(String.valueOf((char) key));
-            System.out.println(data);
         }
-        if (current.size() < 7 && !done) {
+        if (!done) {
             switch (key) {
-                case KeyEvent.VK_A -> current.add(drinks.get(0));
-                case KeyEvent.VK_I -> current.add(drinks.get(1));
-                case KeyEvent.VK_C -> current.add(drinks.get(2));
-                case KeyEvent.VK_D -> current.add(drinks.get(3));
-                case KeyEvent.VK_H -> current.add(drinks.get(4));
-                case KeyEvent.VK_E -> current.add(drinks.get(5));
-                case KeyEvent.VK_F -> current.add(drinks.get(6));
+                case KeyEvent.VK_A -> current = drinks.get(0);
+                case KeyEvent.VK_I -> current = drinks.get(1);
+                case KeyEvent.VK_C -> current = drinks.get(2);
+                case KeyEvent.VK_D -> current = drinks.get(3);
+                case KeyEvent.VK_H -> current = drinks.get(4);
             }
+        }
+        if (key != KeyEvent.VK_G && key != 16 && !done && current != null) {
+            drinkname = FantasyDrink.generateRandomDrink();
         }
     }
     public static class FantasyDrink {
