@@ -1,74 +1,18 @@
 package superimposer.notation;
 
-public enum Cardinality {
+import javax.swing.*;
+import java.io.Serial;
+import java.io.Serializable;
 
-    CONTAIN('✦', Type.RELATION),
-    EXTEND('>', Type.RELATION),
-    VARY('~', Type.RELATION),
+public class Cardinality implements Serializable {
 
-    STATIC('⊡', Type.POSITION),
-    FIXED('⊠', Type.POSITION),
-    RELATIVE('⊞', Type.POSITION),
-    ABSOLUTE('▤', Type.POSITION),
-    PARALLAX('∰', Type.POSITION),
+    @Serial
+    private static final long serialVersionUID = 1;
 
-    COLLIDE('☄', Type.INTERACTION),
-    COLLECT('☰', Type.INTERACTION),
-    DRAG('✍', Type.INTERACTION),
+    public final ImageIcon icon;
 
-    UP('↑', Type.DIRECTION),
-    DOWN('↓', Type.DIRECTION),
-    LEFT('←', Type.DIRECTION),
-    RIGHT('→', Type.DIRECTION),
-
-    WANDER('X', Type.TRANSITION),
-    FLOAT('≋', Type.TRANSITION),
-    SWAY('∿', Type.TRANSITION),
-    ROTATE('↻', Type.TRANSITION),
-    AROUND('∞', Type.TRANSITION),
-    DECAY('⟟', Type.TRANSITION),
-    MORPH('⌖', Type.TRANSITION),
-    ANIMATE('⚙', Type.TRANSITION),
-
-    ARRAY('H', Type.LOCATION),
-    PERLIN('ℙ', Type.LOCATION),
-    VORONOI('▣', Type.LOCATION),
-    SIMPLEX('⨋', Type.LOCATION),
-    PATTERN('♾', Type.LOCATION),
-
-    PLANE('_', Type.PERSPECTIVE),
-    MAZE('⬰', Type.PERSPECTIVE),
-    DUNGEON('⌶', Type.PERSPECTIVE),
-
-    NEW('*', Type.NEW),
-    DELETE('.', Type.DELETE);
-
-    private final char character;
-    private final Type type;
-
-    Cardinality(char character, Type type) {
-        this.character = character;
-        this.type = type;
-    }
-
-    public char getCharacter() {
-        return character;
-    }
-
-    public Type getType() {
-        return type;
-    }
-
-    public enum Type {
-        RELATION(),
-        POSITION(),
-        INTERACTION(),
-        DIRECTION(),
-        TRANSITION(),
-        LOCATION(),
-        PERSPECTIVE(),
-        NEW(),
-        DELETE();
+    public Cardinality(ImageIcon icon) {
+        this.icon = icon;
     }
 
 }

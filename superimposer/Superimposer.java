@@ -1,14 +1,9 @@
 package superimposer;
 
-import superimposer.library.Image;
 import superimposer.network.*;
-import superimposer.notation.Unit;
-import superimposer.vision.AssociationView;
-import superimposer.vision.Perspective;
+import superimposer.vision.Bartender;
 
 import javax.swing.*;
-import java.awt.*;
-import java.awt.image.*;
 import java.io.*;
 import java.util.*;
 
@@ -35,7 +30,7 @@ public class Superimposer {
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(AssociationView::new);
+        SwingUtilities.invokeLater(Bartender::new);
     }
     /*
     public static void main(String[] args) throws IOException {

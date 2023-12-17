@@ -10,15 +10,23 @@ import superimposer.library.Image;
 public class Perspective extends JFrame implements MouseListener, MouseMotionListener, KeyListener, MouseWheelListener {
 
     private Canvas canvas;
+    private Thread thread;
     protected int x, y;
+    protected final int w, h;
+    public boolean up, down, left, right;
+    double FPS = 60;
 
-    public Perspective(int w, int h, String border) {
+    public Perspective(int w, int h, int b) {
+        this.w = w;
+        this.h = h;
         EventQueue.invokeLater(() -> {
             try { UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ignored) {}
             System.setProperty("sun.java2d.opengl", "true");
             System.setProperty("sun.java2d.uiScale", "1");
             setUndecorated(true);
-            this.canvas = new Canvas(this, w, h, border);
+            this.canvas = new Canvas(this, new Image("f"+b+".png").scale(w, h, RenderingHints.VALUE_INTERPOLATION_BILINEAR).image());
+            this.thread = new Thread(this.canvas);
+            this.thread.start();
             setBackground(new Color(0, 0, 0, 0));
             setContentPane(canvas);
             setup();
@@ -34,41 +42,59 @@ public class Perspective extends JFrame implements MouseListener, MouseMotionLis
             setVisible(true);
         });
     }
+
     public void setup() {
 
     }
-    private static class Canvas extends JPanel implements ActionListener {
-        private final BufferedImage border;
+
+    private class Canvas extends JPanel implements Runnable {
+        private final BufferedImage b;
         private final Perspective instance;
-        private Canvas(Perspective instance, int w, int h, String border) {
+
+        private Canvas(Perspective instance, BufferedImage b) {
             super(true);
             this.instance = instance;
-            this.border = new Image(border).scale(w, h, RenderingHints.VALUE_INTERPOLATION_BILINEAR).image();
+            this.b = b;
             setOpaque(false);
         }
+
         @Override
-        public void paintComponent(Graphics g) {
-            super.paintComponent(g);
-            Graphics2D g2d = (Graphics2D) g.create();
-            try {
-                instance.draw(g2d);
-                g2d.drawImage(border, 0, 0, getWidth(), getHeight(), this);
-            } finally {
-                g2d.dispose();
+        public void run() {
+            double drawInterval = 1e9/instance.FPS;
+            double delta = 0;
+            long lastTime = System.nanoTime();
+            long currentTime;
+            while(instance.thread != null) {
+                currentTime = System.nanoTime();
+                delta += (currentTime - lastTime) / drawInterval;
+                lastTime = currentTime;
+                if(delta >= 1){
+                    instance.update();
+                    repaint();
+                    delta--;
+                }
             }
         }
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            repaint();
+
+        public void paintComponent(Graphics g){
+            super.paintComponent(g);
+            Graphics2D g2d = (Graphics2D)g;
+            instance.draw(g2d);
+            g2d.drawImage(b, 0, 0, getWidth(), getHeight(), this);
         }
+
         @Override
         public Dimension getPreferredSize() {
-            return border == null ? new Dimension(instance.getWidth(), instance.getHeight()) : new Dimension(border.getWidth(), border.getHeight());
+            return b == null ? new Dimension(w, h) : new Dimension(b.getWidth(), b.getHeight());
         }
     }
 
+    public void update() {
+
+    }
+
     public void draw(Graphics2D graphics) {
-        
+
     }
 
     @Override
@@ -123,12 +149,22 @@ public class Perspective extends JFrame implements MouseListener, MouseMotionLis
 
     @Override
     public void keyPressed(KeyEvent e) {
-
+        switch (e.getKeyCode()) {
+            case KeyEvent.VK_W -> this.up = true;
+            case KeyEvent.VK_S -> this.down = true;
+            case KeyEvent.VK_A -> this.left = true;
+            case KeyEvent.VK_D -> this.right = true;
+        }
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
-
+        switch (e.getKeyCode()) {
+            case KeyEvent.VK_W -> this.up = false;
+            case KeyEvent.VK_S -> this.down = false;
+            case KeyEvent.VK_A -> this.left = false;
+            case KeyEvent.VK_D -> this.right = false;
+        }
     }
 
     @Override
