@@ -4,88 +4,95 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.*;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.HashMap;
 
-import superimposer.library.Image;
+abstract class Perspective extends JFrame implements MouseListener, MouseMotionListener, KeyListener, MouseWheelListener {
 
-public class Perspective extends JFrame implements MouseListener, MouseMotionListener, KeyListener, MouseWheelListener {
+    protected int X, Y;
+    protected final int W, H;
+    protected HashMap<Integer, Boolean> KEYS;
+    protected final int FPS = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()[0].getDisplayMode().getRefreshRate();
 
-    private Canvas canvas;
-    private Thread thread;
-    protected int x, y;
-    protected final int w, h;
-    public boolean up, down, left, right;
-    double FPS = 60;
-
-    public Perspective(int w, int h, int b) {
-        this.w = w;
-        this.h = h;
-        EventQueue.invokeLater(() -> {
-            try { UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ignored) {}
-            System.setProperty("sun.java2d.opengl", "true");
-            System.setProperty("sun.java2d.uiScale", "1");
-            setUndecorated(true);
-            this.canvas = new Canvas(this, new Image("f"+b+".png").scale(w, h, RenderingHints.VALUE_INTERPOLATION_BILINEAR).image());
-            this.thread = new Thread(this.canvas);
-            this.thread.start();
-            setBackground(new Color(0, 0, 0, 0));
-            setContentPane(canvas);
-            setup();
-            pack();
-            setLocationRelativeTo(null);
-            addMouseListener(this);
-            addMouseMotionListener(this);
-            addKeyListener(this);
-            addMouseWheelListener(this);
-            toFront();
-            setFocusable(true);
-            setFocusableWindowState(true);
-            setVisible(true);
-        });
-    }
-
-    public void setup() {
-
+    public Perspective(int W, int H) {
+        this.W = W;
+        this.H = H;
+        this.KEYS = new HashMap<>();
+        Field[] fields = KeyEvent.class.getDeclaredFields();
+        for (Field field : fields) {
+            if (Modifier.isPublic(field.getModifiers()) && Modifier.isStatic(field.getModifiers())) {
+                try {
+                    KEYS.put(field.getInt(null), false);
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+        try { UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ignored) {}
+        System.setProperty("sun.java2d.opengl", "true");
+        System.setProperty("sun.java2d.uiScale", "1");
+        setUndecorated(true);
+        Canvas canvas = new Canvas(this, new BufferedImage(W, H, BufferedImage.TYPE_INT_ARGB));
+        setBackground(new Color(0, 0, 0, 0));
+        setContentPane(canvas);
+        pack();
+        setLocationRelativeTo(null);
+        setLocationRelativeTo(null);
+        addMouseListener(this);
+        addMouseMotionListener(this);
+        addKeyListener(this);
+        addMouseWheelListener(this);
+        toFront();
+        setFocusable(true);
+        setFocusableWindowState(true);
+        setVisible(true);
+        new Thread(canvas).start();
     }
 
     private class Canvas extends JPanel implements Runnable {
-        private final BufferedImage b;
-        private final Perspective instance;
 
-        private Canvas(Perspective instance, BufferedImage b) {
+        private final Perspective perspective;
+
+        private Canvas(Perspective perspective, BufferedImage b) {
             super(true);
-            this.instance = instance;
-            this.b = b;
+            this.perspective = perspective;
+            //this.b = b;
             setOpaque(false);
         }
 
         @Override
         public void run() {
-            double drawInterval = 1e9/instance.FPS;
-            double delta = 0;
-            long lastTime = System.nanoTime();
-            long currentTime;
-            while(instance.thread != null) {
-                currentTime = System.nanoTime();
-                delta += (currentTime - lastTime) / drawInterval;
-                lastTime = currentTime;
-                if(delta >= 1){
-                    instance.update();
-                    repaint();
-                    delta--;
+            long previousTime = System.nanoTime();
+            long deltaTime = 0;
+            long unprocessedTime = 0;
+            long timePerFrame = 1000000000 / FPS;
+            while (true) {
+                long currentTime = System.nanoTime();
+                deltaTime = currentTime - previousTime;
+                previousTime = currentTime;
+                unprocessedTime += deltaTime;
+                while (unprocessedTime > timePerFrame) {
+                    unprocessedTime -= timePerFrame;
+                    perspective.update();
                 }
+                repaint();
             }
         }
 
-        public void paintComponent(Graphics g){
+        @Override
+        public void paintComponent(Graphics g) {
             super.paintComponent(g);
             Graphics2D g2d = (Graphics2D)g;
-            instance.draw(g2d);
-            g2d.drawImage(b, 0, 0, getWidth(), getHeight(), this);
+            perspective.draw(g2d);
+            //g2d.drawImage(b, 0, 0, getWidth(), getHeight(), this);
         }
 
         @Override
         public Dimension getPreferredSize() {
-            return b == null ? new Dimension(w, h) : new Dimension(b.getWidth(), b.getHeight());
+            //return b == null ? new Dimension(w, h) : new Dimension(b.getWidth(), b.getHeight());
+            return new Dimension(W, H);
         }
     }
 
@@ -97,6 +104,7 @@ public class Perspective extends JFrame implements MouseListener, MouseMotionLis
 
     }
 
+
     @Override
     public void mouseClicked(MouseEvent e) {
 
@@ -105,16 +113,16 @@ public class Perspective extends JFrame implements MouseListener, MouseMotionLis
     @Override
     public void mousePressed(MouseEvent e) {
         if (SwingUtilities.isRightMouseButton(e)) {
-            x = e.getX();
-            y = e.getY();
+            X = e.getX();
+            Y = e.getY();
         }
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
         if (SwingUtilities.isRightMouseButton(e)) {
-            x = e.getX();
-            y = e.getY();
+            X = e.getX();
+            Y = e.getY();
         }
     }
 
@@ -131,8 +139,8 @@ public class Perspective extends JFrame implements MouseListener, MouseMotionLis
     @Override
     public void mouseDragged(MouseEvent e) {
         if (SwingUtilities.isRightMouseButton(e)) {
-            int x2 = e.getX() - x;
-            int y2 = e.getY() - y;
+            int x2 = e.getX() - X;
+            int y2 = e.getY() - Y;
             setLocation(getLocation().x + x2, getLocation().y + y2);
         }
     }
@@ -149,26 +157,17 @@ public class Perspective extends JFrame implements MouseListener, MouseMotionLis
 
     @Override
     public void keyPressed(KeyEvent e) {
-        switch (e.getKeyCode()) {
-            case KeyEvent.VK_W -> this.up = true;
-            case KeyEvent.VK_S -> this.down = true;
-            case KeyEvent.VK_A -> this.left = true;
-            case KeyEvent.VK_D -> this.right = true;
-        }
+        KEYS.put(e.getKeyCode(), true);
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
-        switch (e.getKeyCode()) {
-            case KeyEvent.VK_W -> this.up = false;
-            case KeyEvent.VK_S -> this.down = false;
-            case KeyEvent.VK_A -> this.left = false;
-            case KeyEvent.VK_D -> this.right = false;
-        }
+        KEYS.put(e.getKeyCode(), false);
     }
 
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
 
     }
+
 }

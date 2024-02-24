@@ -6,7 +6,7 @@ import java.awt.*;
 import java.awt.image.*;
 import java.io.IOException;
 
-public class Image {
+public class Image { //EXTEND BUFFEREDIMAGE
 
     private BufferedImage image;
 

@@ -7,11 +7,7 @@ import java.awt.*;
 import java.awt.geom.*;
 import java.io.*;
 
-import org.apache.batik.anim.dom.SAXSVGDocumentFactory;
-import org.apache.batik.anim.dom.SVGOMPolygonElement;
-import org.apache.batik.util.XMLResourceDescriptor;
 import org.w3c.dom.NodeList;
-import org.w3c.dom.svg.SVGDocument;
 
 public class Test2 extends JPanel {
     private Shape startShape;
@@ -71,37 +67,4 @@ public class Test2 extends JPanel {
         });
     }
 
-    private Shape shape(String name) {
-        File file = new File("resource/" + name + ".svg");
-        String parser = XMLResourceDescriptor.getXMLParserClassName();
-        SAXSVGDocumentFactory factory = new SAXSVGDocumentFactory(parser);
-        SVGDocument svgDoc = null;
-        try {
-            svgDoc = (SVGDocument) factory.createDocument(file.toURI().toString());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        NodeList pathList = svgDoc.getElementsByTagName("polygon");
-        SVGOMPolygonElement pathElement = (SVGOMPolygonElement) pathList.item(0);
-        String pathData = pathElement.getAttribute("points");
-        System.out.println(pathData);
-        Path2D path = new Path2D.Double();
-        String[] tokens = pathData.split("\\s+");
-        for (String token : tokens) {
-            String[] coordinates = token.split(",");
-            double x = Double.parseDouble(coordinates[0]) * 2.1;
-            double y = Double.parseDouble(coordinates[1]) * 2.1;
-
-            if (path.getCurrentPoint() == null) {
-                path.moveTo(x, y);
-            } else {
-                path.lineTo(x, y);
-            }
-        }
-
-        path.closePath();
-        path.trimToSize();
-        System.out.println(path.getBounds2D());
-        return path;
-    }
 }

@@ -1,7 +1,7 @@
 package superimposer;
 
 import superimposer.network.*;
-import superimposer.vision.Bartender;
+import superimposer.vision.Perspective3D;
 
 import javax.swing.*;
 import java.io.*;
@@ -30,8 +30,10 @@ public class Superimposer {
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(Bartender::new);
+        System.setProperty("sun.java2d.opengl", "true");
+        SwingUtilities.invokeLater(Perspective3D::new);
     }
+
     /*
     public static void main(String[] args) throws IOException {
         //System.setProperty("sun.java2d.opengl", "true");
