@@ -8,15 +8,47 @@ public class Entity {
     private TexturedModel model;
     private Vector3f position;
     private float rotX, rotY, rotZ;
-    private float scale;
+    private float scaleX, scaleY, scaleZ;
+    private float collisionRadius;
 
-    public Entity(TexturedModel model, Vector3f position, float rotX, float rotY, float rotZ, float scale) {
+    public float getScaleX() {
+        return scaleX;
+    }
+
+    public void setScaleX(float scaleX) {
+        this.scaleX = scaleX;
+    }
+
+    public float getScaleY() {
+        return scaleY;
+    }
+
+    public void setScaleY(float scaleY) {
+        this.scaleY = scaleY;
+    }
+
+    public float getScaleZ() {
+        return scaleZ;
+    }
+
+    public void setScaleZ(float scaleZ) {
+        this.scaleZ = scaleZ;
+    }
+
+    public Entity(TexturedModel model, Vector3f position, float rotX, float rotY, float rotZ, float scale, float collisionRadius) {
         this.model = model;
         this.position = position;
         this.rotX = rotX;
         this.rotY = rotY;
         this.rotZ = rotZ;
-        this.scale = scale;
+        this.scaleX = scale;
+        this.scaleY = scale;
+        this.scaleZ = scale;
+        this.collisionRadius = collisionRadius;
+    }
+
+    public float getCollisionRadius() {
+        return collisionRadius;
     }
 
     public void increasePosition(float dx, float dy, float dz) {
@@ -71,11 +103,4 @@ public class Entity {
         this.rotZ = rotZ;
     }
 
-    public float getScale() {
-        return scale;
-    }
-
-    public void setScale(float scale) {
-        this.scale = scale;
-    }
 }

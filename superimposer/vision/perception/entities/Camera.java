@@ -3,12 +3,15 @@ package superimposer.vision.perception.entities;
 import java.nio.FloatBuffer;
 
 import org.lwjgl.BufferUtils;
+import org.lwjgl.Sys;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Quaternion;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
+import superimposer.vision.perception.terrain.Terrain;
+import superimposer.vision.perception.toolbox.Vector3i;
 
 
 public class Camera
@@ -81,7 +84,7 @@ public class Camera
         roll.setFromAxisAngle(new Vector4f(0f, 0f, 1f, rollAngle * PI_OVER_180));
     }
 
-    public void move() {
+    public void move(Terrain terrain) {
         bearing(Mouse.getDX() / 5f);
         pitch(Mouse.getDY() / -5f);
         if (Keyboard.isKeyDown(Keyboard.KEY_D)) {
@@ -107,27 +110,33 @@ public class Camera
         }
         reorient();
         if (Keyboard.isKeyDown(Keyboard.KEY_W)) {
-            position.z -= direction.z;
-            position.x += direction.x;
+            position.z -= direction.z / 4;
+            position.x += direction.x / 4;
             //position.y = (float) (Math.sin(System.currentTimeMillis() / 1000.0) * 0.1f);
         } else if (Keyboard.isKeyDown(Keyboard.KEY_S)) {
-            position.z -= -direction.z;
-            position.x -= direction.x;
+            position.z -= -direction.z / 4;
+            position.x -= direction.x / 4;
             //position.y = (float) (Math.sin(System.currentTimeMillis() / 1000.0) * 0.1f);
         }
         if (Keyboard.isKeyDown(Keyboard.KEY_D)) {
             Vector3f cross = Vector3f.cross(direction, new Vector3f(0,1,0), null);
-            position.z += cross.z;
-            position.x -= cross.x;
+            position.z += cross.z / 4;
+            position.x -= cross.x / 4;
         } else if (Keyboard.isKeyDown(Keyboard.KEY_A)) {
             Vector3f cross = Vector3f.cross(direction, new Vector3f(0,1,0), null);
-            position.z -= cross.z;
-            position.x += cross.x;
+            position.z -= cross.z / 4;
+            position.x += cross.x / 4;
+        }
+        position.y = terrain.getHeightOfTerrain(position.x, position.z) + 1.8f;
+        if (Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)) {
+            Mouse.setGrabbed(false);
         }
         viewMatrix = new Matrix4f();
         viewMatrix.setIdentity();
         Matrix4f rotMatrix = convertQuaternionToMatrix4f(rotation);
         Matrix4f.mul(rotMatrix, viewMatrix, viewMatrix);
+        //Vector3i testPosition = new Vector3i((int) -position.x, (int) -position.y, (int) -position.z);
+        //viewMatrix.translate(new Vector3f(testPosition.x, testPosition.y, testPosition.z));
         viewMatrix.translate(new Vector3f(-position.x, -position.y, -position.z));
     }
 
@@ -151,4 +160,5 @@ public class Camera
         matrix.m33 = 1.0f;
         return matrix;
     }
+
 }

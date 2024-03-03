@@ -1,6 +1,7 @@
 package superimposer;
 
 import superimposer.network.*;
+import superimposer.vision.Perspective2D;
 import superimposer.vision.Perspective3D;
 
 import javax.swing.*;
@@ -31,7 +32,7 @@ public class Superimposer {
 
     public static void main(String[] args) {
         System.setProperty("sun.java2d.opengl", "true");
-        SwingUtilities.invokeLater(Perspective3D::new);
+        SwingUtilities.invokeLater(new Perspective3D(1000, 1000));
     }
 
     /*

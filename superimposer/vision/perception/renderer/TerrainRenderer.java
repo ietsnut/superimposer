@@ -12,6 +12,7 @@ import superimposer.vision.perception.models.TexturedModel;
 import superimposer.vision.perception.shaders.TerrainShader;
 import superimposer.vision.perception.terrain.Terrain;
 import superimposer.vision.perception.textures.ModelTexture;
+import superimposer.vision.perception.textures.TerrainTexturePack;
 import superimposer.vision.perception.toolbox.Maths;
 
 import java.util.List;
@@ -19,6 +20,7 @@ import java.util.List;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL11.GL_NEAREST;
 import static org.lwjgl.opengl.GL12.GL_TEXTURE_3D;
+import static org.lwjgl.opengl.GL13.*;
 
 public class TerrainRenderer {
 
@@ -28,6 +30,7 @@ public class TerrainRenderer {
         this.shader = shader;
         shader.start();
         shader.loadProjectionMatrix(projectionMatrix);
+        shader.connectTextureUnits();
         shader.stop();
     }
 
@@ -47,17 +50,31 @@ public class TerrainRenderer {
         GL20.glEnableVertexAttribArray(0);
         GL20.glEnableVertexAttribArray(1);
         GL20.glEnableVertexAttribArray(2);
-        ModelTexture texture = terrain.getTexture();
-        shader.loadShineVariables(texture.getShineDamper(), texture.getReflectivity());
-        GL13.glActiveTexture(GL13.GL_TEXTURE0);
         glEnable(GL_TEXTURE_2D);
         glEnable(GL_TEXTURE_3D);
-        GL11.glBindTexture(GL_TEXTURE_2D, terrain.getTexture().getID());
+        bindTextures(terrain);
+        shader.loadShineVariables(1, 0);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     }
+
+
+    private void bindTextures(Terrain terrain) {
+        TerrainTexturePack texturePack = terrain.getTexturePack();
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texturePack.getBackgroundTexture().getTextureID());
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, texturePack.getrTexture().getTextureID());
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, texturePack.getgTexture().getTextureID());
+        glActiveTexture(GL_TEXTURE3);
+        glBindTexture(GL_TEXTURE_2D, texturePack.getbTexture().getTextureID());
+        glActiveTexture(GL_TEXTURE4);
+        glBindTexture(GL_TEXTURE_2D, terrain.getBlendMap().getTextureID());
+    }
+
 
     private void unbindTexturedModel() {
         GL20.glDisableVertexAttribArray(0);

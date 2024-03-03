@@ -12,13 +12,14 @@ import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
 
 public abstract class ShaderProgram {
+
     private int programID;
     private int vertexShaderID;
     private int fragmentShaderID;
 
     private static FloatBuffer matrixBuffer = BufferUtils.createFloatBuffer(16);
 
-    public ShaderProgram(String vertexFile,String fragmentFile){
+    public ShaderProgram(String vertexFile,String fragmentFile) {
         vertexShaderID = loadShader(vertexFile,GL20.GL_VERTEX_SHADER);
         fragmentShaderID = loadShader(fragmentFile,GL20.GL_FRAGMENT_SHADER);
         programID = GL20.glCreateProgram();
@@ -61,6 +62,10 @@ public abstract class ShaderProgram {
 
     protected void loadFloat(int location, float value){
         GL20.glUniform1f(location, value);
+    }
+
+    protected void loadInt(int location, int value) {
+        GL20.glUniform1i(location, value);
     }
 
     protected void loadVector(int location, Vector3f vector){

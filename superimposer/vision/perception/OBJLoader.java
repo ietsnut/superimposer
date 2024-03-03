@@ -2,6 +2,7 @@ package superimposer.vision.perception;
 
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
+import superimposer.vision.perception.models.ModelData;
 import superimposer.vision.perception.models.RawModel;
 import superimposer.vision.perception.toolbox.Vertex;
 
@@ -15,7 +16,7 @@ public class OBJLoader {
 
     private static final String RES_LOC = "resource/";
 
-    public static RawModel loadOBJ(Loader loader, String objFileName) {
+    public static ModelData loadOBJ(String objFileName) {
         FileReader isr = null;
         File objFile = new File(RES_LOC + objFileName + ".obj");
         try {
@@ -76,7 +77,9 @@ public class OBJLoader {
         float furthest = convertDataToArrays(vertices, textures, normals, verticesArray,
                 texturesArray, normalsArray);
         int[] indicesArray = convertIndicesListToArray(indices);
-        return loader.loadToVAO(verticesArray, texturesArray, normalsArray, indicesArray);
+        ModelData data = new ModelData(verticesArray, texturesArray, normalsArray, indicesArray,
+                furthest);
+        return data;
     }
 
     private static void processVertex(String[] vertex, List<Vertex> vertices, List<Integer> indices) {

@@ -33,8 +33,7 @@ public class EntityRenderer {
             List<Entity> batch = entities.get(model);
             for (Entity entity : batch) {
                 prepareInstance(entity);
-                GL11.glDrawElements(GL11.GL_TRIANGLES, model.getRawModel().getVertexCount(),
-                        GL11.GL_UNSIGNED_INT, 0);
+                GL11.glDrawElements(GL11.GL_TRIANGLES, model.getRawModel().getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
             }
             unbindTexturedModel();
         }
@@ -46,6 +45,8 @@ public class EntityRenderer {
         GL20.glEnableVertexAttribArray(0);
         GL20.glEnableVertexAttribArray(1);
         GL20.glEnableVertexAttribArray(2);
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL_REPEAT);
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL_REPEAT);
         ModelTexture texture = model.getTexture();
         shader.loadFakeLightingVariable(texture.isUseFakeLightning());
         shader.loadShineVariables(texture.getShineDamper(), texture.getReflectivity());
@@ -73,7 +74,7 @@ public class EntityRenderer {
         matrix.rotate((float) Math.toRadians(entity.getRotX()), new Vector3f(1, 0, 0));
         matrix.rotate((float) Math.toRadians(entity.getRotY()), new Vector3f(0, 1, 0));
         matrix.rotate((float) Math.toRadians(entity.getRotZ()), new Vector3f(0, 0, 1));
-        matrix.scale(new Vector3f(entity.getScale(), entity.getScale(), entity.getScale()));
+        matrix.scale(new Vector3f(entity.getScaleX(), entity.getScaleY(), entity.getScaleZ()));
         shader.loadTransformationMatrix(matrix);
     }
 
